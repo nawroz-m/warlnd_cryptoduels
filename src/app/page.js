@@ -1,95 +1,93 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+// import styles from "./page.module.css";
+"use client";
+
+import { ethers } from "ethers";
+import { useState } from "react";
+import * as React from "react";
+import Snackbar from "@mui/material/Snackbar";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
+  let signer = null;
+
+  let provider;
+
+  const [open, setOpen] = useState(false);
+  const [connected, setConnected] = useState(false);
+  const [message, setMessage] = useState(null);
+
+  const router = useRouter();
+
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+
+    setOpen(false);
+  };
+  const vertical = "bottom";
+  const horizontal = "right";
+
+  const handlerConnectWallet = async () => {
+    try {
+      if (window.ethereum == null) {
+        // If MetaMask is not installed, we use the default provider,
+        // which is backed by a variety of third-party services (such
+        // as INFURA). They do not have private keys installed so are
+        // only have read-only access
+        console.log("MetaMask not installed; using read-only defaults");
+        provider = ethers.getDefaultProvider();
+      } else {
+        // Connect to the MetaMask EIP-1193 object. This is a standard
+        // protocol that allows Ethers access to make all read-only
+        // requests through MetaMask.
+        provider = new ethers.BrowserProvider(window.ethereum);
+
+        // It also provides an opportunity to request access to write
+        // operations, which will be performed by the private key
+        // that MetaMask manages for the user.
+        signer = await provider.getSigner();
+      }
+
+      setMessage("Connected to Wallet !");
+      setOpen(true);
+      setConnected(true);
+    } catch (err) {
+      if (err) {
+        setMessage("Not connected to wallet!");
+      }
+    }
+  };
+
+  const handleLobby = (e) => {
+    router.push("/lobby");
+  };
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.js</code>
-        </p>
+    <main className="container ">
+      <div className="connect_to_wallet">
+        {!connected ? (
+          <button onClick={handlerConnectWallet} className="mainBtn">
+            connect to wallet
+          </button>
+        ) : (
+          <button onClick={handleLobby} className="mainBtn">
+            Ok
+          </button>
+          // <Link href="/about">About</Link>
+        )}
+
         <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
+          <Snackbar
+            open={open}
+            anchorOrigin={{ vertical, horizontal }}
+            autoHideDuration={4000}
+            onClose={handleClose}
+            message={message}
+
+            // action={action}
+          />
         </div>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore the Next.js 13 playground.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
     </main>
-  )
+  );
 }

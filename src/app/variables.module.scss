@@ -1,0 +1,10 @@
+$primary-color: #64ff00;
+
+$body-font-family: oswald, SB, MBP, -apple-system, BlinkMacSystemFont, Segoe UI,
+  Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", Helvetica Neue,
+  sans-serif;
+
+:export {
+  primaryColor: $primary-color;
+  bodyFontFamily: $body-font-family;
+}
